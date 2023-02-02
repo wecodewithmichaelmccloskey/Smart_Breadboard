@@ -7,6 +7,4 @@
 
 ### Project Description:
 
-
-
 ### Project Inspiration:
