@@ -2,7 +2,7 @@
 
 ### Team Members:
 - Cree Manning (creemanning6@gmail.com)
-- Fatiha Kamal
+- Fatiha Kamal (fatihakamal@gmail.com)
 - Michael McCloskey (mccloskey0104@gmail.com)
 
 ### Project Description:
