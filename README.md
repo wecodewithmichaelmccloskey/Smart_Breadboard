@@ -14,3 +14,7 @@ resistance and current at any point in the circuit using the built in digital mu
 visual feedback to see if the circuit is connected properly.
 
 ### Project Inspiration:
+Learning how to build circuits is a topic many seek to learn. Some simply purchase a breadboard, a few resistors, LED's, transistors, etc. to get started. 
+Once the materials are in some find themselves eager to build right away. There are online tutorials on how to build certain circuits, but that's about it. There's no clear background to why the circuit works the way it does especially for a first time electronics learner. Let alone there is probably no background on how a breadboard and its connection works. 
+
+The Smart Breadboard will help users learn the ins and out of circuitry and how node connections work on a breadboard. The Smart Breadboard is ideal for beginners learning about electronics to anyone who wants to get a refresher on their knowledge of circuitry.
