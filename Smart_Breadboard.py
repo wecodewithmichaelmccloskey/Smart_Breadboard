@@ -23,3 +23,6 @@ def turnOnLED (portAdd):
 #turn on LED by sending byte to port address
 def turnOffLED (portAdd):
     pass
+
+#Current Sensor functions
+#reading current given proper parameters
