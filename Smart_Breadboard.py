@@ -26,3 +26,11 @@ def turnOffLED (portAdd):
 
 #Current Sensor functions
 #reading current given proper parameters
+
+#initializing connections from current sensor to Pi
+def setupCurrentSensor();
+    pass
+
+#reads in input values of voltage and resistance; returns current value
+def readCurrent();
+    pass
