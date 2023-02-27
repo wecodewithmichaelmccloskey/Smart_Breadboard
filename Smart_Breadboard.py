@@ -1,10 +1,35 @@
-#Matrix driver imports + global variables
+# Display modules
+import digitalio
 import board
-import busio
-from adafruit_is31fl3731.matrix import Matrix as Display
+from PIL import Image, ImageDraw, ImageFont
+from adafruit_rgb_display import hx8357
 
-i2c = busio.I2C(board.SCL, board.SDA)
-display = Display(i2c)
+# Configuration for CS and DC pins (these are PiTFT defaults):
+cs_pin = digitalio.DigitalInOut(board.CE0)
+dc_pin = digitalio.DigitalInOut(board.D25)
+reset_pin = digitalio.DigitalInOut(board.D24)
+
+# Config for display baudrate (default max is 24mhz):
+BAUDRATE = 24000000
+
+# Setup SPI bus using hardware SPI:
+spi = board.SPI()
+
+# Create the display:
+disp = hx8357.HX8357(spi, rotation=180,                           # 3.5" HX8357
+    cs=cs_pin,
+    dc=dc_pin,
+    rst=reset_pin,
+    baudrate=BAUDRATE,
+)
+
+#Matrix driver imports + global variables
+#import board
+#import busio
+#from adafruit_is31fl3731.matrix import Matrix as Display
+
+#i2c = busio.I2C(board.SCL, board.SDA)
+#display = Display(i2c)
 
 #Matrix and Matrix A LED Control Register Address
 MTRX_DRV_ADDR = 0x74
@@ -28,10 +53,10 @@ def setupDisplay():
 
 # clears the display so that the screen only shows a white background
 def clearDisplay():
-    pass
+    disp.reset()
 
 # sends text to the display at a specified location
-def sendTextToDisplay():
+def sendTextToDisplay(text):
     pass
 
 # sends an image to the display at a specified location
