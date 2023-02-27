@@ -24,12 +24,12 @@ disp = hx8357.HX8357(spi, rotation=180,                           # 3.5" HX8357
 )
 
 #Matrix driver imports + global variables
-#import board
-#import busio
-#from adafruit_is31fl3731.matrix import Matrix as Display
+import board
+import busio
+from adafruit_is31fl3731.matrix import Matrix as Display
 
-#i2c = busio.I2C(board.SCL, board.SDA)
-#display = Display(i2c)
+i2c = busio.I2C(board.SCL, board.SDA)
+display = Display(i2c)
 
 #Matrix and Matrix A LED Control Register Address
 MTRX_DRV_ADDR = 0x74
