@@ -15,14 +15,6 @@ BAUDRATE = 24000000
 # Setup SPI bus using hardware SPI:
 spi = board.SPI()
 
-# Create the display:
-disp = hx8357.HX8357(spi, rotation=180,                           # 3.5" HX8357
-    cs=cs_pin,
-    dc=dc_pin,
-    rst=reset_pin,
-    baudrate=BAUDRATE,
-)
-
 #Matrix driver imports + global variables
 import board
 import busio
@@ -49,19 +41,77 @@ def info():
 # LCD Touchscreen Display functions
 # initializes display settings
 def setupDisplay():
-    pass
+    # Create the display ( values are for 3.5" HX8357):
+    disp = hx8357.HX8357(
+        spi,
+        rotation=180,
+        cs=cs_pin,
+        dc=dc_pin,
+        rst=reset_pin,
+        baudrate=BAUDRATE,
+    )
+
+    return disp
+
+def createNew(disp):
+    # Create blank image for drawing.
+    # Make sure to create image with mode 'RGB' for full color.
+    if disp.rotation % 180 == 90:
+        height = disp.width  # we swap height/width to rotate it to landscape!
+        width = disp.height
+    else:
+        width = disp.width  # we swap height/width to rotate it to landscape!
+        height = disp.height
+
+    return Image.new("RGB", (width, height))
+
+def createDrawing(image):
+    return ImageDraw.Draw(image)
+
+def drawRectangle(draw, x, y, height, width, color):
+    # Draw a rectangle
+    draw.rectangle((x, y, width, height), fill=color)
 
 # clears the display so that the screen only shows a white background
-def clearDisplay():
-    disp.reset()
+def clearDisplay(disp):
+    disp.fill(0xffff)
 
 # sends text to the display at a specified location
-def sendTextToDisplay(text):
-    pass
+def createText(draw, text, fontsize, x, y, color):
+    font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", fontsize)
+
+    (font_width, font_height) = font.getsize(text)
+    draw.text(
+        (x, y),
+        text,
+        font=font,
+        fill=color,
+    )
 
 # sends an image to the display at a specified location
-def sendImageToDisplay():
-    pass
+def createImage(image_name, width, height, x, y):
+    image = Image.open(image_name)
+
+    # Scale the image to the smaller screen dimension
+    image_ratio = image.width / image.height
+    new_ratio = width / height
+    if new_ratio < image_ratio:
+        scaled_width = image.width * height // image.height
+        scaled_height = height
+    else:
+        scaled_width = width
+        scaled_height = image.height * width // image.width
+    image = image.resize((scaled_width, scaled_height))
+
+    # Crop and center the image
+    #x = scaled_width // 2 - width // 2
+    #y = scaled_height // 2 - height // 2
+    image = image.crop((x, y, x + width, y + height))
+
+    return image
+
+def sendToDisplay(disp, image):
+    disp.image(image)
 
 # Matrix Driver functions
 #takes a "node" number on the physical circuit and returns the address of the port on the matrix driver that will be used to turn on/off the corresponding LED
