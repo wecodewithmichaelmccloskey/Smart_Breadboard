@@ -53,63 +53,60 @@ def setupDisplay():
 
     return disp
 
-def createNew(disp):
-    # Create blank image for drawing.
-    # Make sure to create image with mode 'RGB' for full color.
-    if disp.rotation % 180 == 90:
-        height = disp.width  # we swap height/width to rotate it to landscape!
-        width = disp.height
-    else:
-        width = disp.width  # we swap height/width to rotate it to landscape!
-        height = disp.height
-
-    return Image.new("RGB", (width, height))
-
-def createDrawing(image):
-    return ImageDraw.Draw(image)
-
-def drawRectangle(draw, x, y, height, width, color):
-    # Draw a rectangle
-    draw.rectangle((x, y, width, height), fill=color)
-
-# clears the display so that the screen only shows a white background
+# Clears the display so that the screen only shows a white background
 def clearDisplay(disp):
     disp.fill(0xffff)
 
-# sends text to the display at a specified location
-def createText(draw, text, fontsize, x, y, color):
+# Create blank image for drawings and pictures
+# 'RGB' mode used for full color
+def createNewImage(disp):
+    return Image.new("RGB", (disp.width, disp.height))
+
+# Create a blank drawing to add shapes and text
+def createDrawing(image):
+    return ImageDraw.Draw(image)
+
+# Draw a rectangle at of a specified location, size, and color
+def drawRectangle(draw, x, y, width, height, color):
+    draw.rectangle((x, y, width, height), fill=color)
+
+# Adds text to a drawing at a specified location, size, and color
+def addText(draw, text, x, y, fontsize, length, color):
     font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", fontsize)
 
-    (font_width, font_height) = font.getsize(text)
-    draw.text(
-        (x, y),
-        text,
-        font=font,
-        fill=color,
-    )
+    lines = [""]
+    line_number = 0
+    text_length = 0
+    for word in text.split():
+        text_length += font.getlength(word)
+        if text_length < length:
+            lines[line_number] += word + " "
+        else:
+            lines.append(word + " ")
+            line_number += 1
+            text_length = 0
+    for line in lines:
+        draw.text(
+            (x, y),
+            line,
+            font=font,
+            fill=color
+        )
+        y += font.getsize(text)[1]
 
-# sends an image to the display at a specified location
-def createImage(image_name, width, height, x, y):
-    image = Image.open(image_name)
+# Adds a picture to the image at a specified location, and size
+# Picture size is scaled based on specified height
+# x and y start from top left of the screen and specify the top left point of the picture
+def addPicture(image, image_name, x, y, height):
+    picture_image = Image.open(image_name)
 
-    # Scale the image to the smaller screen dimension
-    image_ratio = image.width / image.height
-    new_ratio = width / height
-    if new_ratio < image_ratio:
-        scaled_width = image.width * height // image.height
-        scaled_height = height
-    else:
-        scaled_width = width
-        scaled_height = image.height * width // image.width
-    image = image.resize((scaled_width, scaled_height))
+    scaled_width = picture_image.width * height // picture_image.height
+    scaled_height = height
+    picture_image = picture_image.resize((scaled_width, scaled_height))
 
-    # Crop and center the image
-    #x = scaled_width // 2 - width // 2
-    #y = scaled_height // 2 - height // 2
-    image = image.crop((x, y, x + width, y + height))
+    Image.Image.paste(image, picture_image, (x, y))
 
-    return image
-
+# Sends an image to the display
 def sendToDisplay(disp, image):
     disp.image(image)
 
