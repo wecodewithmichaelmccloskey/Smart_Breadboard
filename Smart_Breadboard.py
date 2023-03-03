@@ -16,12 +16,12 @@ BAUDRATE = 24000000
 spi = board.SPI()
 
 #Matrix driver imports + global variables
-import board
-import busio
-from adafruit_is31fl3731.matrix import Matrix as Display
+#import board
+#import busio
+#from adafruit_is31fl3731.matrix import Matrix as Display
 
-i2c = busio.I2C(board.SCL, board.SDA)
-display = Display(i2c)
+#i2c = busio.I2C(board.SCL, board.SDA)
+#display = Display(i2c)
 
 #Matrix and Matrix A LED Control Register Address
 MTRX_DRV_ADDR = 0x74
@@ -34,6 +34,7 @@ CA6 = 0x0A
 CA7 = 0x0C
 CA8 = 0x0E
 CA9 = 0x10
+
 def info():  
     '''Prints a basic library description'''
     print("Software library for the Smart Breadboard project.")
@@ -68,7 +69,7 @@ def createDrawing(image):
 
 # Draw a rectangle at of a specified location, size, and color
 def drawRectangle(draw, x, y, width, height, color):
-    draw.rectangle((x, y, width, height), fill=color)
+    draw.rectangle((x, y, x + width, y + height), fill=color)
 
 # Adds text to a drawing at a specified location, size, and color
 def addText(draw, text, x, y, fontsize, length, color):
@@ -78,13 +79,13 @@ def addText(draw, text, x, y, fontsize, length, color):
     line_number = 0
     text_length = 0
     for word in text.split():
-        text_length += font.getlength(word)
-        if text_length < length:
+        if text_length + font.getlength(word) < length:
             lines[line_number] += word + " "
+            text_length += font.getlength(word + " ")
         else:
             lines.append(word + " ")
             line_number += 1
-            text_length = 0
+            text_length = font.getlength(word + " ")
     for line in lines:
         draw.text(
             (x, y),
@@ -97,8 +98,8 @@ def addText(draw, text, x, y, fontsize, length, color):
 # Adds a picture to the image at a specified location, and size
 # Picture size is scaled based on specified height
 # x and y start from top left of the screen and specify the top left point of the picture
-def addPicture(image, image_name, x, y, height):
-    picture_image = Image.open(image_name)
+def addPicture(image, picture_name, x, y, height):
+    picture_image = Image.open(picture_name)
 
     scaled_width = picture_image.width * height // picture_image.height
     scaled_height = height
