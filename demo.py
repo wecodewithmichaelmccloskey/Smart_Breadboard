@@ -44,25 +44,25 @@ sbb.sendToDisplay(disp, image)
 
 # Matrix Driver functions
 #takes a "node" number on the physical circuit and returns the address of the port on the matrix drive>
-#sbb.nodeToLED(LEDID)
+sbb.nodeToLED(LEDID)
 
 # turn off LED by sending byte to port address
-#sbb.turnOnLED(pix)
+sbb.turnOnLED(pix)
  
 #turn on LED by sending byte to port address
-#sbb.turnOffLED(pix)
+sbb.turnOffLED(pix)
 
 #turns off all LEDs in the matrix
-#sbb.turnOffAll()
+sbb.turnOffAll()
 
 # takes in an array of LEDs identfied to be turned on, and another array of LEDs identified to be turned off and performs on/off
-#sbb.runLEDDebug(turnOnArr, turnOffArr)
+sbb.runLEDDebug(turnOnArr, turnOffArr)
 
 #Current Sensor functions
 #reading current given proper parameters
 
 #initializing connections from current sensor to Pi
-#sbb.setupCurrentSensor()
+sbb.setupCurrentSensor()
 
 #reads in input values of voltage and resistance; returns current value
-#sbb.readCurrent()
+sbb.readCurrent()
