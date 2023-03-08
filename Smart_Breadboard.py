@@ -6,7 +6,7 @@ from adafruit_rgb_display import hx8357
 #Current sensor libraries
 import spidev
 import time
-#Creating instance of SPI for curren sensor
+#Creating instance of SPI for current sensor
 spi = spidev.SpiDev()
 
 
@@ -177,10 +177,10 @@ def readCurrent():
     current = adc_value * 0.005  # convert ADC value to current in Amps
     return current
 
-setupSensor()
+setupCurrentSensor()
 
 while True:
-    current = readSensor()
+    current = readCurrent()
     print("Current: %.2f mA" % (current*1000))
     time.sleep(1)
 
