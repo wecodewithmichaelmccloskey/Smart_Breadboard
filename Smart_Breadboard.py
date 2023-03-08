@@ -3,6 +3,12 @@ import digitalio
 import board
 from PIL import Image, ImageDraw, ImageFont
 from adafruit_rgb_display import hx8357
+#Current sensor libraries
+import spidev
+import time
+#Creating instance of SPI for curren sensor
+spi = spidev.SpiDev()
+
 
 # Configuration for CS and DC pins (these are PiTFT defaults):
 cs_pin = digitalio.DigitalInOut(board.CE0)
@@ -159,8 +165,23 @@ def runLEDDebug(turnOnArr, turnOffArr):
 
 #initializing connections from current sensor to Pi
 def setupCurrentSensor():
-    pass
+    spi.open(0, 0) # Open the SPI device on bus 0, device 0
+    spi.max_speed_hz = 1000000 # Set the maximum SPI clock speed to 1 MHz
+
 
 #reads in input values of voltage and resistance; returns current value
 def readCurrent():
-    pass
+    adc_channel = 0 #reading from CH0 on MCP3004
+    data = spi.xfer2([1, (8 + adc_channel) << 4, 0])# Send an SPI message to the ADC to request a conversion on the selected channel 
+    adc_value = ((data[1] & 3) << 8) + data[2] # Extract the ADC value from the received data
+    current = adc_value * 0.005  # convert ADC value to current in Amps
+    return current
+
+setupSensor()
+
+while True:
+    current = readSensor()
+    print("Current: %.2f mA" % (current*1000))
+    time.sleep(1)
+
+
