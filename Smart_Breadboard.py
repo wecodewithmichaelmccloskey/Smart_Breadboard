@@ -8,6 +8,10 @@ import spidev
 import time
 #Creating instance of SPI for current sensor
 spi = spidev.SpiDev()
+#RFID card reader libraries 
+import RPi.GPIO as GPIO
+import sys
+from mfrc522 import SimpleMFRC522
 
 
 # Configuration for CS and DC pins (these are PiTFT defaults):
@@ -184,4 +188,12 @@ while True:
     print("Current: %.2f mA" % (current*1000))
     time.sleep(1)
 
+#RFID card reader functions
 
+#writes to the RFID card, will only be used initially to create the circuit card for the user
+def writeToCard():
+    pass
+
+#used to read the card chosen by the user to identify the circuit instructions and debugging steps to be displayed
+def readCard():
+    pass
