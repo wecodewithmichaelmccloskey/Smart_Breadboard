@@ -8,7 +8,11 @@ import spidev
 import time
 #Creating instance of SPI for current sensor
 spi = spidev.SpiDev()
-
+#RFID card reader libraries 
+import RPi.GPIO as GPIO
+import sys
+from mfrc522 import SimpleMFRC522
+reader = SimpleMFRC522()
 
 # Configuration for CS and DC pins (these are PiTFT defaults):
 cs_pin = digitalio.DigitalInOut(board.CE0)
@@ -120,45 +124,45 @@ def sendToDisplay(disp, image):
 # Matrix Driver functions
 #takes a "node" number on the physical circuit and returns the address of the port on the matrix driver that will be used to turn on/off the corresponding LED
 def nodeToLED(LEDID):
-   if LEDID == 1:
-      return CA1
-   elif LEDID == 2:
-      return CA2
-   elif LEDID == 3:
-       return CA3
-   elif LEDID == 4:             
-      return CA4
-   elif LEDID == 5:
-       return CA5
-   elif LEDID == 6:
-       return CA6
-   elif LEDID == 7:
+    if LEDID == 1:
+        return CA1
+    elif LEDID == 2:
+        return CA2
+    elif LEDID == 3:
+        return CA3
+    elif LEDID == 4:             
+        return CA4
+    elif LEDID == 5:
+        return CA5
+    elif LEDID == 6:
+        return CA6
+    elif LEDID == 7:
         return CA7
-   elif LEDID == 8:
+    elif LEDID == 8:
         return CA8
-   elif LEDID == 9:
+    elif LEDID == 9:
         return CA9
-   else:
+    else:
         return "Value not in Matrix range" 
 
 # turn off LED by sending byte to port address
 def turnOnLED (portAdd):
-      display.pixel(pix, 0, 127)
+    display.pixel(pix, 0, 127)
 
 #turn on LED by sending byte to port address
 def turnOffLED (portAdd):
-     display.pixel(pix, 0, 0)
+    display.pixel(pix, 0, 0)
 
 #turns off all LEDs in the matrix
 def turnOffAll():
-  display.fill(0)
+    display.fill(0)
 
  # takes in an array of LEDs identfied to be turned on, and another array of LEDs identified to be turned off and performs on/off
 def runLEDDebug(turnOnArr, turnOffArr):
-  for i in turnOnArr:
-    turnOnLED(nodeToLED(i))
-  for j in turnOffArr:
-    turnOffLED(nodeToLED(j))
+    for i in turnOnArr:
+        turnOnLED(nodeToLED(i))
+    for j in turnOffArr:
+        turnOffLED(nodeToLED(j))
 
 #Current Sensor functions
 #reading current given proper parameters
@@ -196,4 +200,20 @@ while True:
     print("{:.3f} A".format(current))
     time.sleep(1)
 
+#RFID card reader functions
 
+#writes to the RFID card, will only be used initially to create the circuit card for the user
+def writeToCard():
+    print("Hold card near reader to write")
+    time.sleep(2)
+    data = input("Enter data to write:")
+    reader.write(data)
+    print ("Done writing")
+    
+
+#used to read the card chosen by the user to identify the circuit instructions and debugging steps to be displayed
+def readCard():
+    print("Select a circuit - hold card up to the reader...")
+    id, text = reader.read()
+    print("You've selected the ", text, "circuit to work on...")
+    

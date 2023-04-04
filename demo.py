@@ -66,3 +66,9 @@ sbb.setupCurrentSensor()
 
 #reads in input values of voltage and resistance; returns current value
 sbb.readCurrent()
+
+#writes to the RFID card, will only be used initially to create the circuit card for the user
+sbb.writeToCard()
+
+#used to read the card chosen by the user to identify the circuit instructions and debugging steps to be displayed
+sbb.readCard()
