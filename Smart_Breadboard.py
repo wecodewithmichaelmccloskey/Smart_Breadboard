@@ -171,17 +171,29 @@ def setupCurrentSensor():
 
 #reads in input values of voltage and resistance; returns current value
 def readCurrent():
-    adc_channel = 0 #reading from CH0 on MCP3004
-    data = spi.xfer2([1, (8 + adc_channel) << 4, 0])# Send an SPI message to the ADC to request a conversion on the selected channel 
-    adc_value = ((data[1] & 3) << 8) + data[2] # Extract the ADC value from the received data
-    current = adc_value * 0.005  # convert ADC value to current in Amps
+    # Define MCP3004 channel number
+    channel = 0
+    # Define INA169 shunt resistor value (in ohms)
+    RS = 10
+    # Define reference voltage for ADC
+    VOLTAGE_REF = 3.3
+    # Send an SPI message to the ADC to request a conversion on the selected channel
+    adc_value = spi.xfer2([1, (8 + channel) << 4, 0])
+    # Extract the ADC value from the received data
+    sensor_value = ((adc_value[1] & 3) << 8) + adc_value[2] 
+    # Convert analog value to voltage
+    sensor_value = sensor_value * VOLTAGE_REF / 1023
+    # Calculate current using equation given by INA169 datasheet
+    current = sensor_value / (RS * 10)    
+    
     return current
 
 setupCurrentSensor()
 
 while True:
     current = readCurrent()
-    print("Current: %.2f mA" % (current*1000))
+    # Print current to 3 decimal places
+    print("{:.3f} A".format(current))
     time.sleep(1)
 
 
