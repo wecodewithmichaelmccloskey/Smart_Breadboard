@@ -192,8 +192,6 @@ def readCurrent():
     
     return current
 
-#RFID card reader functions
-
 #writes to the RFID card, will only be used initially to create the circuit card for the user
 def writeToCard():
     print("Hold card near reader to write")
