@@ -192,14 +192,6 @@ def readCurrent():
     
     return current
 
-setupCurrentSensor()
-
-while True:
-    current = readCurrent()
-    # Print current to 3 decimal places
-    print("{:.3f} A".format(current))
-    time.sleep(1)
-
 #RFID card reader functions
 
 #writes to the RFID card, will only be used initially to create the circuit card for the user
