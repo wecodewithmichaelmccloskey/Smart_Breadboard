@@ -14,6 +14,11 @@ import sys
 from mfrc522 import SimpleMFRC522
 reader = SimpleMFRC522()
 
+# Button pins
+left_button_pin = 5
+right_button_pin = 26
+middle_button_pin = 6
+
 # Configuration for CS and DC pins (these are PiTFT defaults):
 cs_pin = digitalio.DigitalInOut(board.CE0)
 dc_pin = digitalio.DigitalInOut(board.D25)
@@ -207,3 +212,17 @@ def readCard():
     id, text = reader.read()
     print("You've selected the ", text, "circuit to work on...")
     
+def setupButtons():
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(left_button_pin, GPIO.IN)
+    GPIO.setup(right_button_pin, GPIO.IN)
+    GPIO.setup(middle_button_pin, GPIO.IN)
+
+def readLeftButton():
+    GPIO.wait_for_edge(left_button_pin, GPIO.FALLING)
+
+def readRightButton():
+    GPIO.wait_for_edge(right_button_pin, GPIO.FALLING)
+
+def readMiddleButton():
+    GPIO.wait_for_edge(middle_button_pin, GPIO.FALLING)

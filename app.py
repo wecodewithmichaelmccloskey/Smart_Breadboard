@@ -1,7 +1,6 @@
 import Smart_Breadboard as sbb
 from threading import Thread, Lock, Event
 import time
-import random
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -13,42 +12,84 @@ DISPLAY_HEIGHT = 320
 global page
 page = "Start-Up"
 
+global instr_num
+instr_num = 1
+
 rfid_tap = Event()
 left_button_press = Event()
-
-disp = sbb.setupDisplay()
+right_button_press = Event()
+middle_button_press = Event()
 
 def rfidTap():
-    while (True):
-        time.sleep(random.randint(10, 15))
-        rfid_tap.set()
-        print("rfid tapped")
+    pass
 
 def leftButtonPress():
     while (True):
-        time.sleep(random.randint(10, 15))
+        sbb.readLeftButton()
         left_button_press.set()
         print("left button pressed")
 
+def rightButtonPress():
+    while (True):
+        sbb.readRightButton()
+        right_button_press.set()
+        print("right button pressed")
+
+def middleButtonPress():
+    while (True):
+        sbb.readMiddleButton()
+        middle_button_press.set()
+        print("middle button pressed")
+
 def updateDisplay():
     global page
+    global instr_num
 
     while True:
         print(page)
         if page == "Start-Up":
             displayStartup()
-            if rfid_tap.is_set():
-                page = "Card Selection Confirmation"
-                rfid_tap.clear()
-            if left_button_press.is_set():
-                left_button_press.clear()
-        elif page == "Card Selection Confirmation":
-            displayCardSelectionConfirmation()
-            if rfid_tap.is_set():
-                rfid_tap.clear()
+        elif page == "Instructions":
             if left_button_press.is_set():
                 page = "Start-Up"
-                left_button_press.clear()
+            if right_button_press.is_set():
+                page = "End"
+            if middle_button_press.is_set():
+                page = "Debug"
+        elif page == "Debug":
+            if left_button_press.is_set():
+                page = "Instructions"
+            if right_button_press.is_set():
+                page = "End"
+            if middle_button_press.is_set():
+                page = "Help"
+        elif page == "Help":
+            if left_button_press.is_set():
+                page = "Debug"
+            if right_button_press.is_set():
+                page = "Instructions"
+            if middle_button_press.is_set():
+                page = "Instructions"
+        elif page == "End":
+            if left_button_press.is_set():
+                page = "Start-Up"
+            if right_button_press.is_set():
+                page = "Start-Up"
+            if middle_button_press.is_set():
+                page = "Start-Up"
+
+        if rfid_tap.is_set():
+            print("rfid tapped")
+            page = "Instructions"
+            instr_num = 1
+            rfid_tap.clear()
+        if left_button_press.is_set():
+            left_button_press.clear()
+        if right_button_press.is_set():
+            right_button_press.clear()
+        if middle_button_press.is_set():
+            middle_button_press.clear()
+
         time.sleep(0.1)
 
 def displayStartup():
@@ -76,13 +117,21 @@ def displayCardSelectionConfirmation():
 display_thread = Thread(target=updateDisplay)
 rfid_thread = Thread(target=rfidTap)
 left_button_thread = Thread(target=leftButtonPress)
+right_button_thread = Thread(target=rightButtonPress)
+middle_button_thread = Thread(target=middleButtonPress)
 
+disp = sbb.setupDisplay()
 sbb.clearDisplay(disp)
+sbb.setupButtons()
 
 display_thread.start()
 rfid_thread.start()
 left_button_thread.start()
+right_button_thread.start()
+middle_button_thread.start()
 
 display_thread.join()
 rfid_thread.join()
 left_button_thread.join()
+right_button_thread.join()
+middle_button_thread.join()
