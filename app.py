@@ -25,19 +25,19 @@ def rfidTap():
 
 def leftButtonPress():
     while (True):
-        sbb.readLeftButton()
+        sbb.wait_for_back_button()
         left_button_press.set()
         print("left button pressed")
 
 def rightButtonPress():
     while (True):
-        sbb.readRightButton()
+        sbb.wait_for_next_button()
         right_button_press.set()
         print("right button pressed")
 
 def middleButtonPress():
     while (True):
-        sbb.readMiddleButton()
+        sbb.wait_for_home_button()
         middle_button_press.set()
         print("middle button pressed")
 

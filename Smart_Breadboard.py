@@ -15,9 +15,9 @@ from mfrc522 import SimpleMFRC522
 reader = SimpleMFRC522()
 
 # Button pins
-left_button_pin = 5
-right_button_pin = 26
-middle_button_pin = 6
+buttons = {"Back": [5, None], "Next": [26, None], "Home": [6, None]}
+BUTTON_PIN = 0
+BUTTON_PREV_STATE = 1
 
 # Configuration for CS and DC pins (these are PiTFT defaults):
 cs_pin = digitalio.DigitalInOut(board.CE0)
@@ -214,15 +214,33 @@ def readCard():
     
 def setupButtons():
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(left_button_pin, GPIO.IN)
-    GPIO.setup(right_button_pin, GPIO.IN)
-    GPIO.setup(middle_button_pin, GPIO.IN)
+    for button_name, button_values in buttons.items():
+        GPIO.setup(button_values[BUTTON_PIN], GPIO.IN)
+        buttons[button_name][BUTTON_PREV_STATE] = GPIO.input(button_values[BUTTON_PIN])
 
-def readLeftButton():
-    GPIO.wait_for_edge(left_button_pin, GPIO.FALLING)
+def wait_for_home_button():
+    while(True):
+        cur_state = GPIO.input(buttons["Home"][BUTTON_PIN])
+        # print("Home: ", cur_state)
+        if buttons["Home"][BUTTON_PREV_STATE] == GPIO.HIGH and cur_state == GPIO.LOW:
+            buttons["Home"][BUTTON_PREV_STATE] = cur_state
+            return
+        buttons["Home"][BUTTON_PREV_STATE] = cur_state
 
-def readRightButton():
-    GPIO.wait_for_edge(right_button_pin, GPIO.FALLING)
+def wait_for_back_button():
+    while(True):
+        cur_state = GPIO.input(buttons["Back"][BUTTON_PIN])
+        # print("Back: ", cur_state)
+        if buttons["Back"][BUTTON_PREV_STATE] == GPIO.HIGH and cur_state == GPIO.LOW:
+            buttons["Back"][BUTTON_PREV_STATE] = cur_state
+            return
+        buttons["Back"][BUTTON_PREV_STATE] = cur_state
 
-def readMiddleButton():
-    GPIO.wait_for_edge(middle_button_pin, GPIO.FALLING)
+def wait_for_next_button():
+    while(True):
+        cur_state = GPIO.input(buttons["Next"][BUTTON_PIN])
+        # print("Next: ", cur_state)
+        if buttons["Next"][BUTTON_PREV_STATE] == GPIO.HIGH and cur_state == GPIO.LOW:
+            buttons["Next"][BUTTON_PREV_STATE] = cur_state
+            return
+        buttons["Next"][BUTTON_PREV_STATE] = cur_state
