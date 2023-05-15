@@ -108,13 +108,14 @@ class Instruction(Page):
         return self.back
 
 class Debug(Page):
-    def __init__(self, display, back, next, text, low_voltage, high_voltage,):
+    def __init__(self, display, back, next, text, low_voltage, high_voltage):
         Page.__init__(self, display, back, next)
         self.text = text
         self.low_voltage = low_voltage
         self.high_voltage = high_voltage
         self.locked = False
         self.warning = False
+        self.help = None
 
         sbb.addText(self.drawing, text = self.text, x = 10, y = 10, fontsize = 24, length = 460, color = "black")
         sbb.addText(self.drawing, text = "Expected Voltage: " + str((low_voltage + high_voltage) // 2), x = 60, y = 100, fontsize = 20, length = 480, color = "black")
@@ -150,10 +151,29 @@ class Debug(Page):
     def get_prev_page(self):
         return self.back
 
+    def home(self):
+        return self.help
+
 class Help(Page):
-    def __init__(self, display, suggestions):
-        Page.__init__(self, display, None, None)
+    def __init__(self, display, back, next, suggestions):
+        Page.__init__(self, display, back, next)
         self.suggestions = suggestions
+
+        for i in range(len(self.suggestions)):
+            sbb.addText(self.drawing, text = suggestions[i], x = 10, y = (i * 80 + 10), fontsize = 20, length = 480, color = "black")
+
+        sbb.drawRectangle(self.drawing, x = 0, y = 250, width = DISPLAY_WIDTH, height = 2, color = "black")
+        sbb.drawRectangle(self.drawing, x = 159, y = 250, width = 2, height = 70, color = "black")
+        sbb.drawRectangle(self.drawing, x = 319, y = 250, width = 2, height = 70, color = "black")
+        sbb.addText(self.drawing, text = "BACK", x = 25, y = 266, fontsize = 40, length = 480, color = "black")
+        sbb.addText(self.drawing, text = "HOME", x = 185, y = 266, fontsize = 40, length = 480, color = "black")
+        sbb.addText(self.drawing, text = "NEXT", x = 345, y = 266, fontsize = 40, length = 480, color = "black")
+
+    def get_next_page(self):
+        return self.next
+
+    def get_prev_page(self):
+        return self.back
 
 class End(Page):
     def __init__(self, display):
@@ -221,9 +241,17 @@ class Display:
             prev_page.next = instr
             prev_page = instr
 
-        for debug_info in circuit_info[3].split(";"):
+        for i in range(len(circuit_info[3].split(";"))):
+            debug_info = circuit_info[3].split(";")[i]
+            help_info = circuit_info[4].split(";")[i]
+
             text, low_voltage, high_voltage = debug_info.split(":")
-            debug = Debug(self.display, prev_page, None, text.strip(), int(low_voltage.strip()), int(high_voltage.strip()))
+            suggestions = help_info.split(":")
+
+            debug = Debug(self.display, prev_page, None, text.strip(), int(low_voltage.strip()), int(high_voltage.strip())) 
+            help = Help(self.display, debug, debug, [suggestion.strip() for suggestion in suggestions])
+            debug.help = help
+
             prev_page.next = debug
             prev_page = debug
 
@@ -238,7 +266,11 @@ class Display:
         self.current_page.drive_leds()
 
     def move_to_next_page(self):
-        self.current_page = self.current_page.get_next_page()
+        page = self.current_page.get_next_page()
+        if page == None:
+            self.current_page = self.start_page.next
+        else:
+            self.current_page = page
 
     def move_to_prev_page(self):
         prev_page = self.current_page.get_prev_page()
