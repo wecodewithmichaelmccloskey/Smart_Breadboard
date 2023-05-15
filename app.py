@@ -6,7 +6,7 @@ import time
 
 # {rfid_num: filename}
 global card_dict
-card_dict = {247721997126: "sample_circuit.csv"}
+card_dict = {247721997126: "sample_circuit.csv", 177436878227: "rgb_circuit.csv"}
 
 global curr_rfid_num
 curr_rfid_num = None

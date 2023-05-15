@@ -108,17 +108,19 @@ class Instruction(Page):
         return self.back
 
 class Debug(Page):
-    def __init__(self, display, back, next, text, low_voltage, high_voltage):
+    def __init__(self, display, back, next, text, nodes, low_voltage, high_voltage, expected_voltage):
         Page.__init__(self, display, back, next)
         self.text = text
+        self.nodes = nodes
         self.low_voltage = low_voltage
         self.high_voltage = high_voltage
+        self.expected_voltage = expected_voltage
         self.locked = False
         self.warning = False
         self.help = None
 
         sbb.addText(self.drawing, text = self.text, x = 10, y = 10, fontsize = 24, length = 460, color = "black")
-        sbb.addText(self.drawing, text = "Expected Voltage: " + str((low_voltage + high_voltage) // 2), x = 60, y = 100, fontsize = 20, length = 480, color = "black")
+        sbb.addText(self.drawing, text = "Expected Voltage: " + str(expected_voltage / 1000) + " V", x = 60, y = 100, fontsize = 20, length = 480, color = "black")
         sbb.addText(self.drawing, text = "Measured Voltage: ", x = 60, y = 120, fontsize = 20, length = 480, color = "black")
         sbb.addText(self.drawing, text = "Expected Current: ", x = 60, y = 140, fontsize = 20, length = 480, color = "black")
         sbb.addText(self.drawing, text = "Measured Current: ", x = 60, y = 160, fontsize = 20, length = 480, color = "black")
@@ -140,6 +142,10 @@ class Debug(Page):
             symbol = "greencheck.jpg"
         sbb.addPicture(self.image, symbol, 220, 200, 40)
         return self.image
+
+    def drive_leds(self):
+        sbb.turnOffAll()
+        sbb.runLEDDebug(self.nodes, [])
 
     def get_next_page(self):
         if self.locked:
@@ -188,7 +194,7 @@ class End(Page):
         sbb.drawRectangle(self.drawing, x = 159, y = 250, width = 2, height = 70, color = "black")
         sbb.drawRectangle(self.drawing, x = 319, y = 250, width = 2, height = 70, color = "black")
         sbb.addText(self.drawing, text = "BACK", x = 25, y = 266, fontsize = 40, length = 480, color = "black")
-        sbb.addText(self.drawing, text = "NEXT", x = 185, y = 266, fontsize = 40, length = 480, color = "black")
+        sbb.addText(self.drawing, text = "HOME", x = 185, y = 266, fontsize = 40, length = 480, color = "black")
         sbb.addText(self.drawing, text = "NEXT", x = 345, y = 266, fontsize = 40, length = 480, color = "black")
 
     def get_image(self):
@@ -245,10 +251,11 @@ class Display:
             debug_info = circuit_info[3].split(";")[i]
             help_info = circuit_info[4].split(";")[i]
 
-            text, low_voltage, high_voltage = debug_info.split(":")
+            text, nodes, low_voltage, high_voltage, expected_voltage = debug_info.split(":")
+            nodes = nodes.split("^")
             suggestions = help_info.split(":")
 
-            debug = Debug(self.display, prev_page, None, text.strip(), int(low_voltage.strip()), int(high_voltage.strip())) 
+            debug = Debug(self.display, prev_page, None, text.strip(), [int(node.strip()) for node in nodes], int(low_voltage.strip()), int(high_voltage.strip()), int(expected_voltage.strip()))
             help = Help(self.display, debug, debug, [suggestion.strip() for suggestion in suggestions])
             debug.help = help
 

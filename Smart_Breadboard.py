@@ -181,7 +181,7 @@ def setupCurrentSensor():
 #reads in input values of voltage and resistance; returns current value
 def readCurrent():
     # Define MCP3004 channel number
-    channel = 0
+    channel = 1
     # Define INA169 shunt resistor value (in ohms)
     RS = 10
     # Define reference voltage for ADC
