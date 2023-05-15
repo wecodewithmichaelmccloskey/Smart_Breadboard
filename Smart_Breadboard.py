@@ -1,4 +1,4 @@
-# Display modules
+#Display modules
 import digitalio
 import board
 from PIL import Image, ImageDraw, ImageFont
@@ -15,7 +15,7 @@ from mfrc522 import SimpleMFRC522
 reader = SimpleMFRC522()
 
 # Button pins
-buttons = {"Back": [5, None], "Next": [26, None], "Home": [6, None]}
+buttons = {"Back": [23, None], "Next": [27, None], "Home": [22, None]}
 BUTTON_PIN = 0
 BUTTON_PREV_STATE = 1
 
@@ -24,19 +24,19 @@ cs_pin = digitalio.DigitalInOut(board.CE0)
 dc_pin = digitalio.DigitalInOut(board.D25)
 reset_pin = digitalio.DigitalInOut(board.D24)
 
-# Config for display baudrate (default max is 24mhz):
-BAUDRATE = 24000000
-
 # Setup SPI bus using hardware SPI:
 spi = board.SPI()
 
-#Matrix driver imports + global variables
-#import board
-#import busio
-#from adafruit_is31fl3731.matrix import Matrix as Display
+# Config for display baudrate (default max is 24mhz):
+BAUDRATE = 24000000
 
-#i2c = busio.I2C(board.SCL, board.SDA)
-#display = Display(i2c)
+#Matrix driver imports + global variables
+import board
+import busio
+from adafruit_is31fl3731.matrix import Matrix as Display
+
+i2c = busio.I2C(board.SCL, board.SDA)
+display = Display(i2c)
 
 #Matrix and Matrix A LED Control Register Address
 MTRX_DRV_ADDR = 0x74
@@ -152,11 +152,11 @@ def nodeToLED(LEDID):
 
 # turn off LED by sending byte to port address
 def turnOnLED (portAdd):
-    display.pixel(pix, 0, 127)
+    display.pixel(portAdd, 0, 127)
 
 #turn on LED by sending byte to port address
 def turnOffLED (portAdd):
-    display.pixel(pix, 0, 0)
+    display.pixel(portAdd, 0, 0)
 
 #turns off all LEDs in the matrix
 def turnOffAll():
@@ -208,10 +208,9 @@ def writeToCard():
 
 #used to read the card chosen by the user to identify the circuit instructions and debugging steps to be displayed
 def readCard():
-    print("Select a circuit - hold card up to the reader...")
-    id, text = reader.read()
-    print("You've selected the ", text, "circuit to work on...")
-    
+    id = reader.read_id_no_block()
+    return id
+
 def setupButtons():
     GPIO.setmode(GPIO.BCM)
     for button_name, button_values in buttons.items():
@@ -226,6 +225,7 @@ def wait_for_home_button():
             buttons["Home"][BUTTON_PREV_STATE] = cur_state
             return
         buttons["Home"][BUTTON_PREV_STATE] = cur_state
+        time.sleep(0.01)
 
 def wait_for_back_button():
     while(True):
@@ -235,12 +235,14 @@ def wait_for_back_button():
             buttons["Back"][BUTTON_PREV_STATE] = cur_state
             return
         buttons["Back"][BUTTON_PREV_STATE] = cur_state
+        time.sleep(0.01)
 
 def wait_for_next_button():
     while(True):
         cur_state = GPIO.input(buttons["Next"][BUTTON_PIN])
-        # print("Next: ", cur_state)
+        #print("Next: ", cur_state)
         if buttons["Next"][BUTTON_PREV_STATE] == GPIO.HIGH and cur_state == GPIO.LOW:
             buttons["Next"][BUTTON_PREV_STATE] = cur_state
             return
         buttons["Next"][BUTTON_PREV_STATE] = cur_state
+        time.sleep(0.01)
