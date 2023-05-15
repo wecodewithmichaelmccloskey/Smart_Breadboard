@@ -13,6 +13,24 @@ import RPi.GPIO as GPIO
 import sys
 from mfrc522 import SimpleMFRC522
 reader = SimpleMFRC522()
+#Matrix Driver back up - use GPIO pins
+GPIO.setmode(GPIO.BCM)
+#pins[i] = A(i+1)
+pins = [1, 12, 13, 14, 15, 16, 18, 26, 1]
+for (i in range(9)):
+    GPIO.setup(pins[i], GPIO.OUT)
+    
+'''
+pinA1 = 4
+pinA2 = 12
+pinA3 = 13
+pinA4 = 14
+pinA5 = 15
+pinA6 = 16
+pinA7 = 18
+pinA8 = 26
+pinA9 = 1
+'''
 
 # Button pins
 buttons = {"Back": [23, None], "Next": [27, None], "Home": [22, None]}
@@ -127,6 +145,7 @@ def sendToDisplay(disp, image):
     disp.image(image)
 
 # Matrix Driver functions
+'''
 #takes a "node" number on the physical circuit and returns the address of the port on the matrix driver that will be used to turn on/off the corresponding LED
 def nodeToLED(LEDID):
     if LEDID == 1:
@@ -161,8 +180,21 @@ def turnOffLED (portAdd):
 #turns off all LEDs in the matrix
 def turnOffAll():
     display.fill(0)
+'''
+# Back up Matrix Driver functions in case Matrix Driver doesn't work
+def nodeToLED(LEDID):
+     return (pins.index(LEDID))+1
+    
+def turnOnLED(pin):
+    GPIO.output(pin, GPIO.HIGH)
 
- # takes in an array of LEDs identfied to be turned on, and another array of LEDs identified to be turned off and performs on/off
+def turnOffLED(pin):
+    GPIO.output(pin, GPIO.LOW)
+
+def turnOffAll():
+    for (i in range(9)):
+        GPIO.output(pins[i], GPIO.LOW)
+ # takes in an array of LEDs identfied to be turned on, and another array of LEDs identified to be turned off and performs on/off - same for matri driver + back up 
 def runLEDDebug(turnOnArr, turnOffArr):
     for i in turnOnArr:
         turnOnLED(nodeToLED(i))
