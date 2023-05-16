@@ -59,9 +59,9 @@ class Instruction(Page):
         self.led_nodes = self.removeGNDVCC(nodes)
         self.picture = picture
         self.notes = notes
-        sbb.addText(self.drawing, "Connect " + str(self.comp) + " to nodes " + ", ".join([str(node) for node in self.nodes]), 250, 10, 24, 220, "black")
+        sbb.addText(self.drawing, "Connect " + str(self.comp) + " to nodes " + ", ".join([str(node) for node in self.nodes]), 240, 10, 24, 230, "black")
         if self.notes != "":
-            sbb.addText(self.drawing, "Note: " + self.notes, 250, 100, 24, 220, "black")
+            sbb.addText(self.drawing, "Note: " + self.notes, 240, 100, 24, 230, "black")
         sbb.drawRectangle(self.drawing, x = 0, y = 250, width = DISPLAY_WIDTH, height = 2, color = "black")
         sbb.drawRectangle(self.drawing, x = 159, y = 250, width = 2, height = 70, color = "black")
         sbb.drawRectangle(self.drawing, x = 319, y = 250, width = 2, height = 70, color = "black")
